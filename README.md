@@ -245,6 +245,6 @@ $$
 G_{i', j'}^{HO}: \quad w_{i', j'} \frac{1}{2} \left( u_{i', j} + u_{i', j + 1} \right)
 $$
 
-[![Simulation Vectors](https://raw.githubusercontent.com/olhabohdanenko/two-phase-flow-simulation/main/assets/simulation_vectors_0.mp4)](https://github.com/olhabohdanenko/two-phase-flow-simulation/blob/main/assets/simulation_vectors_0.mp4)
+<video src="https://raw.githubusercontent.com/olhabohdanenko/two-phase-flow-simulation/main/assets/simulation_vectors_0.mp4" autoplay loop muted playsinline width="100%"></video>
 
-[![Simulation Contour](https://raw.githubusercontent.com/olhabohdanenko/two-phase-flow-simulation/main/assets/simulation_omega_2d0_contour.mp4)](https://github.com/olhabohdanenko/two-phase-flow-simulation/blob/main/assets/simulation_omega_2d0_contour.mp4)
+<video src="https://raw.githubusercontent.com/olhabohdanenko/two-phase-flow-simulation/main/assets/simulation_omega_2d0_contour.mp4" autoplay loop muted playsinline width="100%"></video>
