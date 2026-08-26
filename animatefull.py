@@ -4,19 +4,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-# Шлях до вашого HDF5 файлу (змініть за потреби)
-H5_FILE = "run_20260816_015819/simulation_data_step_0.h5"  # або вкажіть ваш актуальний шлях
+H5_FILE = "run_20260822_150629/simulation_data_step_60000.h5"
 
 
 def create_animation(h5_path, gif_path="simulation_beta_2d4.gif", animation = "beta", fps=15):
 
     if not os.path.exists(h5_path):
-        print(f"❌ Помилка: Файл {h5_path} не знайдено!")
+        print(f"Помилка: Файл {h5_path} не знайдено!")
         return
 
     with h5py.File(h5_path, "r") as f:
         if animation not in f:
-            print("❌ Помилка: Датасет '{animation}' відсутній у файлі!")
+            print("Помилка: Датасет '{animation}' відсутній у файлі!")
             return
 
         beta_dataset = f[animation]
@@ -25,7 +24,6 @@ def create_animation(h5_path, gif_path="simulation_beta_2d4.gif", animation = "b
 
         print(f"Знайдено {num_steps} кроків. Розмір сітки: {grid_shape[0]}x{grid_shape[1]}")
 
-        # --- ПОКРОКОВИЙ РОЗРАХУНОК МІНІМУМУ ТА МАКСИМУМУ (БЕЗ PEKА / ОШИБОК GZIP) ---
         print("Сканування меж значень (min/max)...")
         global_min = float("inf")
         global_max = float("-inf")
@@ -33,12 +31,10 @@ def create_animation(h5_path, gif_path="simulation_beta_2d4.gif", animation = "b
 
         for i in range(num_steps):
             try:
-                # Читаємо лише один крок за раз
                 step_data = beta_dataset[i]
 
-                # Пропускаємо кадри з NaN чи Inf
                 if np.isnan(step_data).any() or np.isinf(step_data).any():
-                    print(f"⚠️ Попередження: Крок {i} містить NaN/Inf. Пропускаємо.")
+                    print(f"Попередження: Крок {i} містить NaN/Inf. Пропускаємо.")
                     continue
 
                 s_min = np.min(step_data)
@@ -52,24 +48,21 @@ def create_animation(h5_path, gif_path="simulation_beta_2d4.gif", animation = "b
                 valid_indices.append(i)
 
             except OSError as e:
-                print(f"⚠️ Зауваження: Помилка читання кроку {i} ({e}). Зупинка сканування.")
+                print(f"Зауваження: Помилка читання кроку {i} ({e}). Зупинка сканування.")
                 break
 
         if not valid_indices:
-            print("❌ Не вдалося зчитати жодного коректного кадру!")
+            print("Не вдалося зчитати жодного коректного кадру!")
             return
 
         print(f"Успішно зчитано {len(valid_indices)} кадрів. Діапазон {animation}: [{global_min:.4f}, {global_max:.4f}]")
 
-        # --- НАЛАШТУВАННЯ ПЛОТТИНГУ ---
         fig, ax = plt.subplots(figsize=(8, 5))
 
-        # Беремо перший валідний кадр для ініціалізації
         first_frame = beta_dataset[valid_indices[0]]
 
-        # Створюємо початковий pcolormesh / imshow
         im = ax.imshow(
-            first_frame.T,  # Транспонуємо (N, M) для адекватної орієнтації X/Y
+            first_frame.T,  # Транспонуємо (N, M)
             origin="lower",
             cmap="viridis",
             vmin=global_min,
@@ -77,9 +70,6 @@ def create_animation(h5_path, gif_path="simulation_beta_2d4.gif", animation = "b
             aspect="auto"
         )
 
-        # ---------------------------------------------------------------------
-        # ДОДАНО: Початкові ізолінії (зберігаємо посилання у список)
-        # ---------------------------------------------------------------------
         contours = [ax.contour(first_frame.T, colors='white', alpha=0.4, levels=8, origin="lower")]
 
         cbar = fig.colorbar(im, ax=ax)
@@ -88,15 +78,12 @@ def create_animation(h5_path, gif_path="simulation_beta_2d4.gif", animation = "b
         ax.set_xlabel("X (M)")
         ax.set_ylabel("Z (N)")
 
-        # --- ФУНКЦІЯ ОНОВЛЕННЯ КАДРІВ ---
         def update(frame_idx):
             actual_step = valid_indices[frame_idx]
             frame_data = beta_dataset[actual_step]
             
-            # 1. Оновлюємо imshow
             im.set_array(frame_data.T)
             
-            # 2. ДОДАНО: Безумовне видалення старих ізоліній (Matplotlib 3.8+ safe)
             if contours[0] is not None:
                 if hasattr(contours[0], 'remove'):
                     contours[0].remove()
@@ -104,25 +91,24 @@ def create_animation(h5_path, gif_path="simulation_beta_2d4.gif", animation = "b
                     for c in contours[0].collections:
                         c.remove()
 
-            # 3. ДОДАНО: Малюємо нові ізолінії для поточного кадру
             contours[0] = ax.contour(frame_data.T, colors='white', alpha=0.4, levels=8, origin="lower")
 
             title_text.set_text(f"Step: {actual_step}")
             return [im, title_text]
 
-        # --- СТВОРЕННЯ ТА ЗБЕРЕЖЕННЯ АНІМАЦІЇ ---
+
         print(f"Генерація GIF ({gif_path})...")
         anim = FuncAnimation(
             fig,
             update,
             frames=len(valid_indices),
             interval=1000 // fps,
-            blit=False  # ЗМІНЕНО: Matplotlib вимагає blit=False при динамічному перемалюванні contour
+            blit=False
         )
 
         anim.save(gif_path, writer="pillow", fps=fps)
         plt.close(fig)
-        print(f"✅ Анімацію успішно збережено у {gif_path}!")
+        print(f"Анімацію успішно збережено у {gif_path}!")
 
 
 def create_vector_animation(h5_path, gif_path="simulation_vector_field.gif", bg_field="omega", fps=15, step=4):
@@ -132,14 +118,13 @@ def create_vector_animation(h5_path, gif_path="simulation_vector_field.gif", bg_
     """
 
     if not os.path.exists(h5_path):
-        print(f"❌ Помилка: Файл {h5_path} не знайдено!")
+        print(f"Помилка: Файл {h5_path} не знайдено!")
         return
 
     with h5py.File(h5_path, "r") as f:
-        # Перевіряємо наявність потрібних датасетів
         for req in ["u", "w", bg_field]:
             if req not in f:
-                print(f"❌ Помилка: Датасет '{req}' відсутній у файлі!")
+                print(f"Помилка: Датасет '{req}' відсутній у файлі!")
                 return
 
         u_ds = f["u"]
@@ -151,7 +136,6 @@ def create_vector_animation(h5_path, gif_path="simulation_vector_field.gif", bg_
 
         print(f"Знайдено {num_steps} кроків. Розмір сітки: {grid_shape[0]}x{grid_shape[1]}")
 
-        # --- ТВІЙ ПОКРОКОВИЙ РОЗРАХУНОК МІНІМУМУ ТА МАКСИМУМУ (ДЛЯ ФОНУ) ---
         print(f"Сканування меж значений для {bg_field}...")
         global_min = float("inf")
         global_max = float("-inf")
@@ -164,7 +148,7 @@ def create_vector_animation(h5_path, gif_path="simulation_vector_field.gif", bg_
                 w_step = w_ds[i]
 
                 if any(np.isnan(arr).any() or np.isinf(arr).any() for arr in [bg_step, u_step, w_step]):
-                    print(f"⚠️ Попередження: Крок {i} містить NaN/Inf. Пропускаємо.")
+                    print(f"Попередження: Крок {i} містить NaN/Inf. Пропускаємо.")
                     continue
 
                 s_min, s_max = np.min(bg_step), np.max(bg_step)
@@ -174,21 +158,19 @@ def create_vector_animation(h5_path, gif_path="simulation_vector_field.gif", bg_
                 valid_indices.append(i)
 
             except OSError as e:
-                print(f"⚠️ Зауваження: Помилка читання кроку {i} ({e}). Зупинка сканування.")
+                print(f"Зауваження: Помилка читання кроку {i} ({e}). Зупинка сканування.")
                 break
 
         if not valid_indices:
-            print("❌ Не вдалося зчитати жодного коректного кадру!")
+            print("Не вдалося зчитати жодного коректного кадру!")
             return
 
-        # --- НАЛАШТУВАННЯ ПЛОТТИНГУ ---
         fig, ax = plt.subplots(figsize=(8, 5))
 
         first_bg = bg_ds[valid_indices[0]]
         first_u = u_ds[valid_indices[0]]
         first_w = w_ds[valid_indices[0]]
 
-        # 1. Фоновій масив (pcolormesh / imshow)
         im = ax.imshow(
             first_bg.T,
             origin="lower",
@@ -198,24 +180,19 @@ def create_vector_animation(h5_path, gif_path="simulation_vector_field.gif", bg_
             aspect="auto"
         )
 
-        # 2. Сітка координат для ВЕКТОРІВ
-        # Оскільки ти робиш .T, X відповідає M (axis 0), Z відповідає N (axis 1)
         M_len, N_len = grid_shape
         X_coords, Z_coords = np.meshgrid(np.arange(M_len), np.arange(N_len))
 
-        # Зріз сітки (прорідження), щоб стрілки не накладалися занадто щільно
         X_sub = X_coords[::step, ::step]
         Z_sub = Z_coords[::step, ::step]
 
-        # Увага: беремо транспоновані компоненти відповідно до твого imshow(data.T)
         u_sub = first_u.T[::step, ::step]
         w_sub = first_w.T[::step, ::step]
 
-        # 3. Накладання векторного поля (quiver)
         quiv = ax.quiver(
             X_sub, Z_sub, u_sub, w_sub,
             color='black',
-            scale=None,      # Автомасштабування довжини стрілок
+            scale=None,
             pivot='mid',
             angles='xy',
             scale_units='xy',
@@ -229,7 +206,6 @@ def create_vector_animation(h5_path, gif_path="simulation_vector_field.gif", bg_
         ax.set_xlabel("X (M)")
         ax.set_ylabel("Z (N)")
 
-        # --- ФУНКЦІЯ ОНОВЛЕННЯ КАДРІВ ---
         def update(frame_idx):
             actual_step = valid_indices[frame_idx]
             
@@ -237,10 +213,8 @@ def create_vector_animation(h5_path, gif_path="simulation_vector_field.gif", bg_
             u_data = u_ds[actual_step]
             w_data = w_ds[actual_step]
 
-            # Оновлюємо колірне поле
             im.set_array(bg_data.T)
 
-            # Оновлюємо вектори швидкості
             u_sub_new = u_data.T[::step, ::step]
             w_sub_new = w_data.T[::step, ::step]
             quiv.set_UVC(u_sub_new, w_sub_new)
@@ -248,7 +222,6 @@ def create_vector_animation(h5_path, gif_path="simulation_vector_field.gif", bg_
             title_text.set_text(f"Step: {actual_step}")
             return [im, quiv, title_text]
 
-        # --- СТВОРЕННЯ ТА ЗБЕРЕЖЕННЯ АНІМАЦІЇ ---
         print(f"Генерація GIF ({gif_path})...")
         anim = FuncAnimation(
             fig,
@@ -260,12 +233,12 @@ def create_vector_animation(h5_path, gif_path="simulation_vector_field.gif", bg_
 
         anim.save(gif_path, writer="pillow", fps=fps)
         plt.close(fig)
-        print(f"✅ Векторну анімацію успішно збережено у {gif_path}!")
+        print(f"Векторну анімацію успішно збережено у {gif_path}!")
 
 if __name__ == "__main__":
     save = "0"
-    for var in ["u", "w", "omega"]:
+    for var in ["u", "w", "p", "beta"]:
         gif_path = f"simulation_{var}_2d{save}_contour.gif"
         create_animation(H5_FILE, gif_path, var, fps=15)
 
-    create_vector_animation(H5_FILE, gif_path=f"simulation_vectors_{save}.gif", bg_field="omega", fps=15, step=4)
+    create_vector_animation(H5_FILE, gif_path=f"simulation_vectors_{save}.gif", bg_field="beta", fps=15, step=4)
