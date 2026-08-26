@@ -241,6 +241,10 @@ $$
 F_{i', j}^{HO}: \quad \frac{1}{2} \left( u_{i', j}^{2} + u_{i' + 1, j}^{2} \right)
 $$
 
+<video src="./assets/simulation_omega_2d0_contour.mp4" autoplay loop muted playsinline width="100%"></video>
+
+<video src="./assets/simulation_vectors_0.mp4" autoplay loop muted playsinline width="100%"></video>
+
 $$
 G_{i', j'}^{HO}: \quad w_{i', j'} \frac{1}{2} \left( u_{i', j} + u_{i', j + 1} \right)
 $$
