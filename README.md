@@ -245,6 +245,6 @@ $$
 G_{i', j'}^{HO}: \quad w_{i', j'} \frac{1}{2} \left( u_{i', j} + u_{i', j + 1} \right)
 $$
 
-<video src="https://github.com/user-attachments/assets/bab5aa57-7738-4863-bc31-fd7aab58a766" autoplay loop muted playsinline width="100%"></video>
+<video src="https://github.com/user-attachments/assets/49e5469b-eeba-4c27-91ac-3b55c52579af" autoplay loop muted playsinline width="100%"></video>
 
-<video src="https://github.com/user-attachments/assets/bdd3c594-b35a-40ac-b1c6-416954044bff" autoplay loop muted playsinline width="100%"></video>
+<video src="https://github.com/user-attachments/assets/dd856e40-b103-413b-8d9b-1a727b68687f" autoplay loop muted playsinline width="100%"></video>
