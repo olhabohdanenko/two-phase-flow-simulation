@@ -2,11 +2,10 @@ from numba import njit, prange
 import numpy as np
 
 from .operators import divergence
-from ..convection.beta2 import conv_beta_2_tvd
+from ..convection.beta import conv_beta_tvd
 
-# SLAE
 @njit
-def build_rhs(u, w, u_, w_, u_2, w_2, beta, grid_param, simulate_param, physical_param):
+def build_rhs(u_, w_, u_2, w_2, beta, grid_param, simulate_param, physical_param):
     M = grid_param.M
     N = grid_param.N
 
@@ -20,9 +19,9 @@ def build_rhs(u, w, u_, w_, u_2, w_2, beta, grid_param, simulate_param, physical
 
     for i in range(2, M - 2):
         for j in range(2, N - 2):
-            div_beta_w2 = - beta[i, j] * divergence(u_2, w_2, dx, dz, i, j) + conv_beta_2_tvd(u, w, u_2, w_2, beta, dx, dz, i, j)
+            div_beta_w2 = -conv_beta_tvd(u_2, w_2, beta, dx, dz, i, j) + conv_beta_tvd(u_, w_, beta, dx, dz, i, j)
             
-            target_div = divergence(u_, w_, dx, dz, i, j) - y / (1.0 - y * beta[i, j]) * (div_beta_w2)
+            target_div = divergence(u_, w_, dx, dz, i, j) - y * div_beta_w2
             
             rhs[i, j] = target_div / tau
             

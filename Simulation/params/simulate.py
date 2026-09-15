@@ -5,7 +5,9 @@ import numpy as np
 
 sim_spec = [
       ('tau', float64),
+
       ('Re', float64),
+      ('Sh', float64),
 
       ('V_x', float64),
       ('V_z', float64),
@@ -20,9 +22,11 @@ sim_spec = [
 
 @jitclass(sim_spec)
 class SimulateParams:
-      def __init__(self, tau, Re, V_x, V_z, step_max, step_inj, nozzle_positions, nozzle_r):
+      def __init__(self, tau, Re, Sh, V_x, V_z, step_max, step_inj, nozzle_positions, nozzle_r):
             self.tau = tau
+
             self.Re = Re
+            self.Sh = Sh
 
             self.V_x = V_x
             self.V_z = V_z

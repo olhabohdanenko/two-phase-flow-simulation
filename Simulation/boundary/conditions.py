@@ -2,49 +2,79 @@ from numba import njit, prange
 
 import numpy as np
 
-# Boundary Condition
+"""
+Потік зліва направо з вільним ковзанням на дні і стелі
+"""
 @njit
-def apply_boundary_condition_velocity(u, w, u_, w_, grid_param, simulate_param):
+def apply_boundary_condition_velocity(u, w, grid_param, simulate_param):
     M = grid_param.M
     N = grid_param.N
 
+    """
+    Потік зліва направо
+    """
     # Ліва
     # Вхід рідини
     u[0, :] = u[1, :] = simulate_param.V_x
-    u_[0, :] = u_[1, :] = simulate_param.V_x
     w[0, :] = w[1, :] = 0.0
-    w_[0, :] = w_[1, :] = 0.0
 
     # Права
     # Вільний вихід рідини
     u[M - 1, :] = u[M - 2, :] = u[M - 3, :]
     w[M - 1, :] = w[M - 2, :] = w[M - 3, :]
-    u_[M - 1, :] = u_[M - 2, :] = u_[M - 3, :]
-    w_[M - 1, :] = w_[M - 2, :] = w_[M - 3, :]
 
     # Нижня
     # Вільне ковзання
     u[:, 0] = u[:, 1] = u[:, 2]
-    u_[:, 0] = u_[:, 1] = u_[:, 2]
     w[:, 0] = w[:, 1] = 0.0
-    w_[:, 0] = w_[:, 1] = 0.0
 
     # Верхня
     # Вільне ковзання
     u[:, N - 1] = u[:, N - 2] = u[:, N - 3]
-    w[:, N - 2] = w[:, N - 3] = 0.0
-    u_[:, N - 1] = u_[:, N - 2] = u_[:, N - 3]
-    w_[:, N - 2] = w_[:, N - 3] = 0.0
+    w[:, N - 1] = w[:, N - 2] = w[:, N - 3] = 0.0
+
+@njit
+def apply_boundary_condition_velocity_2(u_2, w_2, grid_param, simulate_param):
+    M = grid_param.M
+    N = grid_param.N
+
+    """
+    Просто чаша
+    """
+    # Ліва
+    # Вільне ковзання
+    u_2[0, :] = u_2[1, :] = 0.0
+    w_2[0, :] = w_2[1, :] = w_2[2, :]
+
+    # Права
+    # Вільне ковзання
+    # u_2[M - 1, :] = u_2[M - 2, :] = u_2[M - 3, :] = 0.0
+    u_2[M - 1, :] = u_2[M - 2, :] = u_2[M - 3, :] = u_2[M - 4, :]
+    w_2[M - 1, :] = w_2[M - 2, :] = w_2[M - 3, :]
+
+    # Нижня
+    # Вільне ковзання
+    u_2[:, 0] = u_2[:, 1] = u_2[:, 2]
+    w_2[:, 0] = w_2[:, 1] = 0.0
+
+    # Верхня
+    # Вільний вихід
+    u_2[:, N - 1] = u_2[:, N - 2] = u_2[:, N - 3]
+    w_2[:, N - 1] = w_2[:, N - 2] = w_2[:, N - 3] = 0.0
+    # w_2[:, N - 1] = w_2[:, N - 2] = w_2[:, N - 3] = w_2[:, N - 4]
+
 
 @njit
 def apply_boundary_condition_beta(beta, u_2, grid_param, simulate_param):
+    M = grid_param.M
+    N = grid_param.N
     # Ліва
     # Вхід рідини
     beta[0, :] = beta[1, :] = beta[2, :]
 
     # Права
     # Вільний вихід рідини
-    beta[grid_param.M - 1, :] = beta[grid_param.M - 2, :] = beta[grid_param.M - 3, :]
+    beta[M - 1, :] = beta[M - 2, :] = beta[M - 3, :]
 
     # Нижня
     # Вільне ковзання
@@ -52,20 +82,43 @@ def apply_boundary_condition_beta(beta, u_2, grid_param, simulate_param):
 
     # Верхня
     # Вільне ковзання
-    beta[:, grid_param.N - 1] = beta[:, grid_param.N - 2] = beta[:, grid_param.N - 3]
+    beta[:, N - 1] = beta[:, N - 2] = beta[:, N - 3]
+
+"""
+Потік зліва направо
+"""
+@njit
+def apply_boundary_condition_pressure(p, grid_param, simulate_param):
+    M = grid_param.M
+    N = grid_param.N
+    # Ліва
+    # Вхід рідини
+    p[0, :] = p[1, :] = p[2, :]
+
+    # Права
+    # Вільний вихід рідини
+    p[M - 1, :] = p[M - 2, :] = 0.0
+
+    # Нижня
+    # Вільне ковзання
+    p[:, 0] = p[:, 1] = p[:, 2]
+
+    # Верхня
+    # Вільне ковзання
+    p[:, N - 1] = p[:, N - 2] = p[:, N - 3]
 
 @njit
 def apply_boundary_condition_inject(beta, u_2, grid_param, simulate_param):
-    X_inject = 0.01
+    X_inject = 0.02
     Y_inject = 0.01
     I_max_x = int(X_inject / grid_param.dx) + 1
     I_max_y = int(Y_inject / grid_param.dz) + 1
     for i in range(1, I_max_x):
         for j in range(1, I_max_y):
-            beta[i, grid_param.N - j] = 1E-4
+            beta[i, grid_param.N - j] = 1E-3
 
 @njit
-def apply_boundary_condition(u, w, u_, w_, grid_param, simulate_param):
+def apply_boundary_condition(u, w, grid_param, simulate_param):
     for i in range(1, grid_param.M - 1):
         x = (i - 0.5) * grid_param.dx
         
@@ -78,5 +131,3 @@ def apply_boundary_condition(u, w, u_, w_, grid_param, simulate_param):
         if in_nozzle:
             w[i, 0] = w[i, 1] = simulate_param.V_z
             u[i, 0] = u[i, 1] = 0.0
-            w_[i, 0] = w_[i, 1] = simulate_param.V_z
-            u_[i, 0] = u_[i, 1] = 0.0

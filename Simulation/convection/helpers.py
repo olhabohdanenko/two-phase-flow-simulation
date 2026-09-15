@@ -154,37 +154,3 @@ def r_beta_z(w_2, beta, i, j):
     znam = beta[i, j + 1] - beta[i, j] if W >= 0 else beta[i, j] - beta[i, j + 1]
     return chis / znam if abs(znam) >= 1E-14 else 0.0
 
-@njit
-def F_beta2_x_LO(u, u_2, beta, i, j):
-    U_rel = u[i, j] - u_2[i, j]
-    return U_rel * beta[i, j] if U_rel >= 0 else U_rel * beta[i + 1, j]
-
-@njit
-def F_beta2_x_HO(u, u_2, beta, i, j):
-    U_rel = u[i, j] - u_2[i, j]
-    return U_rel * 0.5 * (beta[i, j] + beta[i + 1, j])
-
-@njit
-def r_beta2_x(u, u_2, beta, i, j):
-    U_rel = u[i, j] - u_2[i, j]
-    chis = beta[i, j] - beta[i - 1, j] if U_rel >= 0 else beta[i + 1, j] - beta[i + 2, j]
-    znam = beta[i + 1, j] - beta[i, j] if U_rel >= 0 else beta[i, j] - beta[i + 1, j]
-    return chis / znam if abs(znam) >= 1E-14 else 0.0
-
-@njit
-def F_beta2_z_LO(w, w_2, beta, i, j):
-    W_rel = w[i, j] - w_2[i, j]
-    return W_rel * beta[i, j] if W_rel >= 0 else W_rel * beta[i, j + 1]
-
-@njit
-def F_beta2_z_HO(w, w_2, beta, i, j):
-    W_rel = w[i, j] - w_2[i, j]
-    return W_rel * 0.5 * (beta[i, j] + beta[i, j + 1])
-
-@njit
-def r_beta2_z(w, w_2, beta, i, j):
-    W_rel = w[i, j] - w_2[i, j]
-    chis = beta[i, j] - beta[i, j - 1] if W_rel >= 0 else beta[i, j + 1] - beta[i, j + 2]
-    znam = beta[i, j + 1] - beta[i, j] if W_rel >= 0 else beta[i, j] - beta[i, j + 1]
-    return chis / znam if abs(znam) >= 1E-14 else 0.0
-

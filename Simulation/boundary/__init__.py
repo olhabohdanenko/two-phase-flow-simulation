@@ -1,3 +1,3 @@
-from .conditions import apply_boundary_condition_velocity, apply_boundary_condition, apply_boundary_condition_beta, apply_boundary_condition_inject
+from .conditions import apply_boundary_condition_velocity, apply_boundary_condition_velocity_2, apply_boundary_condition, apply_boundary_condition_beta, apply_boundary_condition_pressure, apply_boundary_condition_inject
 
-__all__ = ["apply_boundary_condition_velocity", "apply_boundary_condition", "apply_boundary_condition_beta", "apply_boundary_condition_inject"]
+__all__ = ["apply_boundary_condition_velocity", "apply_boundary_condition_velocity_2", "apply_boundary_condition", "apply_boundary_condition_beta", "apply_boundary_condition_pressure", "apply_boundary_condition_inject"]

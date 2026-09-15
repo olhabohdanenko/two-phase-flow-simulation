@@ -11,14 +11,14 @@ class JSONLogger:
     def __enter__(self):
         return self
 
-    def log_step(self, step, u_n1, w_n1, p, beta_n1, Div):
+    def log_step(self, step, u_n1, w_n1, p, beta_n1, Div, Div_max):
         max_u = float(np.max(np.abs(u_n1)))
         max_w = float(np.max(np.abs(w_n1)))
         max_p = float(np.max(np.abs(p)))
         max_beta = float(np.max(beta_n1))
         max_div = float(np.max(np.abs(Div)))
         
-        is_exploded = bool(np.isnan(Div).any() or np.isinf(Div).any())
+        is_exploded = bool(np.isnan(Div).any() or np.isinf(Div).any() or max_div > Div_max)
 
         log_entry = {
             "step": int(step),

@@ -4,7 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-H5_FILE = "run_20260822_150629/simulation_data_step_60000.h5"
+from Simulation.utils import compute_vorticity_3d
+
+H5_FILE = "run_20260914_144529/simulation_data_step_0.h5"
+from Simulation.params import GridParams
 
 
 def create_animation(h5_path, gif_path="simulation_beta_2d4.gif", animation = "beta", fps=15):
@@ -57,7 +60,7 @@ def create_animation(h5_path, gif_path="simulation_beta_2d4.gif", animation = "b
 
         print(f"Успішно зчитано {len(valid_indices)} кадрів. Діапазон {animation}: [{global_min:.4f}, {global_max:.4f}]")
 
-        fig, ax = plt.subplots(figsize=(8, 5))
+        fig, ax = plt.subplots(figsize=(12, 2.3))
 
         first_frame = beta_dataset[valid_indices[0]]
 
@@ -67,7 +70,7 @@ def create_animation(h5_path, gif_path="simulation_beta_2d4.gif", animation = "b
             cmap="viridis",
             vmin=global_min,
             vmax=global_max,
-            aspect="auto"
+            aspect="equal"
         )
 
         contours = [ax.contour(first_frame.T, colors='white', alpha=0.4, levels=8, origin="lower")]
@@ -116,20 +119,28 @@ def create_vector_animation(h5_path, gif_path="simulation_vector_field.gif", bg_
     bg_field: назва фонового скалярного поля (наприклад, 'omega' або 'u')
     step: крок прорідження сітки для стрілочок (що більше значення, тим рідші стрілки)
     """
+    M, N = 204, 38  # Кількість комірок по горизонталі/вертикалі (з 2-ма заграничними з кожного боку)
+    dx, dz = 0.0025, 0.0025  # Кроки по сітці по горизонтальному/вертикальному напрямах (без урахування 4 заграничних)
+
+    # Створення екземпляру класа сітка
+    grid_param = GridParams(M, N, dx, dz)
+
 
     if not os.path.exists(h5_path):
         print(f"Помилка: Файл {h5_path} не знайдено!")
         return
 
     with h5py.File(h5_path, "r") as f:
-        for req in ["u", "w", bg_field]:
+        for req in ["u", "w"]:
             if req not in f:
                 print(f"Помилка: Датасет '{req}' відсутній у файлі!")
                 return
 
         u_ds = f["u"]
         w_ds = f["w"]
-        bg_ds = f[bg_field]
+        u_arr = u_ds[:]
+        w_arr = w_ds[:]
+        bg_ds = compute_vorticity_3d(u_arr, w_arr, grid_param.dx, grid_param.dz)
 
         num_steps = min(u_ds.shape[0], w_ds.shape[0], bg_ds.shape[0])
         grid_shape = bg_ds.shape[1:]  # (M, N)
@@ -165,7 +176,7 @@ def create_vector_animation(h5_path, gif_path="simulation_vector_field.gif", bg_
             print("Не вдалося зчитати жодного коректного кадру!")
             return
 
-        fig, ax = plt.subplots(figsize=(8, 5))
+        fig, ax = plt.subplots(figsize=(12, 2.3))
 
         first_bg = bg_ds[valid_indices[0]]
         first_u = u_ds[valid_indices[0]]
@@ -174,10 +185,10 @@ def create_vector_animation(h5_path, gif_path="simulation_vector_field.gif", bg_
         im = ax.imshow(
             first_bg.T,
             origin="lower",
-            cmap="coolwarm" if bg_field == "omega" else "viridis",
+            cmap="coolwarm" if bg_field != "omega" else "viridis",
             vmin=global_min,
             vmax=global_max,
-            aspect="auto"
+            aspect="equal"
         )
 
         M_len, N_len = grid_shape
@@ -236,9 +247,9 @@ def create_vector_animation(h5_path, gif_path="simulation_vector_field.gif", bg_
         print(f"Векторну анімацію успішно збережено у {gif_path}!")
 
 if __name__ == "__main__":
-    save = "0"
-    for var in ["u", "w", "p", "beta"]:
+    save = "2"
+    for var in ["beta"]:
         gif_path = f"simulation_{var}_2d{save}_contour.gif"
         create_animation(H5_FILE, gif_path, var, fps=15)
 
-    create_vector_animation(H5_FILE, gif_path=f"simulation_vectors_{save}.gif", bg_field="beta", fps=15, step=4)
+    create_vector_animation(H5_FILE, gif_path=f"simulation_vectors_{save}.gif", bg_field="omega", fps=15, step=4)

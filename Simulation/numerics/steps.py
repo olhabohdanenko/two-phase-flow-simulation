@@ -1,17 +1,19 @@
 from numba import njit, prange
 import numpy as np
 
-from ..convection.velocity import conv_u_weno3, conv_w_weno3, conv_uw_weno3, conv_wu_weno3
-from ..convection.beta import conv_beta_tvd
-from ..convection.beta2 import conv_beta_2_tvd
+from ..solvers import *
+
+from ..convection.velocity import *
+from ..convection.beta import *
 from ..physics import *
 
 from .slae import build_rhs
 from ..numerics.operators import divergence
+from ..boundary import apply_boundary_condition_pressure
 
 # steps
 @njit(parallel=True)
-def step1(u, u_, w, w_, p, beta, grid_param, simulate_param, physical_param):
+def step1(u, u_, w, w_, beta, grid_param, simulate_param, physical_param):
     M = grid_param.M
     N = grid_param.N
 
@@ -23,14 +25,15 @@ def step1(u, u_, w, w_, p, beta, grid_param, simulate_param, physical_param):
 
     for i in prange(2, M - 2):
         for j in range(2, N - 2):
-            u_[i, j] = u[i, j] + tau * (-conv_u_weno3(u, dx, i, j) - conv_uw_weno3(u, w, dz, i, j) + diff_u(u, w, beta, dx, dz, Re, i, j, physical_param))
+            u_[i, j] = u[i, j] + tau * (-conv_u_tvd(u, dx, i, j) - conv_uw_tvd(u, w, dz, i, j) + diff_u_full(u, w, beta, dx, dz, Re, i, j, physical_param))
         
     for i in prange(2, M - 2):
         for j in range(2, N - 2):
-            w_[i, j] = w[i, j] + tau * (-conv_w_weno3(w, dz, i, j) - conv_wu_weno3(u, w, dx, i, j) + diff_w(u, w, beta, dx, dz, Re, i, j, physical_param) - gravity_force(beta, i, j, physical_param))
+            w_[i, j] = w[i, j] + tau * (-conv_w_tvd(w, dz, i, j) - conv_wu_tvd(u, w, dx, i, j) + diff_w_full(u, w, beta, dx, dz, Re, i, j, physical_param) - gravity_force(beta, i, j, physical_param))
 
-def step2(u, w, u_, w_, u_2, w_2, beta, p, grid_param, simulate_param, physical_param, PETSc_param):
-    rhs = -build_rhs(u, w, u_, w_, u_2, w_2, beta, grid_param, simulate_param, physical_param)
+def step2(u_, w_, u_2, w_2, beta, p, phi, grid_param, simulate_param, physical_param, PETSc_param):
+    PETSc_param.update(beta, physical_param.y)
+    rhs = -build_rhs(u_, w_, u_2, w_2, beta, grid_param, simulate_param, physical_param)
 
     p = PETSc_param.solve(rhs, p)
 
@@ -47,6 +50,9 @@ def step3(u, u_, w, w_, p, grid_param, simulate_param):
     for i in prange(2, M - 2):
         for j in range(2, N - 2):
             u[i, j] = u_[i, j] - tau * (p[i + 1, j] - p[i, j]) / dx
+
+    for i in prange(2, M - 2):
+        for j in range(2, N - 2):
             w[i, j] = w_[i, j] - tau * (p[i, j + 1] - p[i, j]) / dz
 
 @njit(parallel=True)
@@ -69,9 +75,10 @@ def step4(u_1, w_1, u_2, w_2, beta, grid_param, simulate_param, physical_param):
     g = physical_param.g
 
     Re = simulate_param.Re
+    Sh = simulate_param.Sh
     tau = simulate_param.tau
 
-    for i in prange(2, M - 2):
+    for i in range(2, M - 2):
         for j in range(2, N - 2):
             v21_x = u_2[i, j] - u_1[i, j]
             v21_z = w_2[i, j] - w_1[i, j]
@@ -83,23 +90,23 @@ def step4(u_1, w_1, u_2, w_2, beta, grid_param, simulate_param, physical_param):
             u_2[i, j] = u_2[i, j] + (tau / inertia) * f_D_x
             w_2[i, j] = w_2[i, j] + (tau / inertia) * (-y * g + f_D_z)
             
-            beta_x = 0.5 * (beta[i + 1, j] + beta[i, j])
-            beta_z = 0.5 * (beta[i, j + 1] + beta[i, j])
+            # beta_x = 0.5 * (beta[i + 1, j] + beta[i, j])
+            # beta_z = 0.5 * (beta[i, j + 1] + beta[i, j])
             
-            beta_x_safe = max(beta_x, 1E-12)
-            beta_z_safe = max(beta_z, 1E-12)
+            # beta_x_safe = max(beta_x, 1E-12)
+            # beta_z_safe = max(beta_z, 1E-12)
             
-            grad_beta_x = (beta[i + 1, j] - beta[i, j]) / dx
-            grad_beta_z = (beta[i, j + 1] - beta[i, j]) / dz
+            # grad_beta_x = (beta[i + 1, j] - beta[i, j]) / dx
+            # grad_beta_z = (beta[i, j + 1] - beta[i, j]) / dz
             
-            w_2_dx = -1.0 / beta_x_safe * D_x(u_2, D, dx, Re, i, j) * grad_beta_x
-            w_2_dz = -1.0 / beta_z_safe * D_z(w_2, D, dz, Re, i, j) * grad_beta_z
+            # w_2_dx = -1.0 / beta_x_safe * D_x(u_2, D, dx, Sh, i, j) * grad_beta_x
+            # w_2_dz = -1.0 / beta_z_safe * D_z(w_2, D, dz, Sh, i, j) * grad_beta_z
             
-            u_2[i, j] += w_2_dx
-            w_2[i, j] += w_2_dz
+            # u_2[i, j] += w_2_dx
+            # w_2[i, j] += w_2_dz
 
 @njit(parallel=True)
-def step4_semi_fully_implicit(u, w, u_1, w_1, u_2, w_2, beta, grid_param, simulate_param, physical_param):
+def step4_semi_fully_implicit(u_1, w_1, u_2, w_2, beta, grid_param, simulate_param, physical_param):
     x = physical_param.x
     y = physical_param.y
 
@@ -118,9 +125,10 @@ def step4_semi_fully_implicit(u, w, u_1, w_1, u_2, w_2, beta, grid_param, simula
     g = physical_param.g
 
     Re = simulate_param.Re
+    Sh = simulate_param.Sh
     tau = simulate_param.tau
 
-    for i in prange(2, M - 2):
+    for i in range(2, M - 2):
         for j in range(2, N - 2):
             # Відносна швидкість та її модуль
             v21_x = u_2[i, j] - u_1[i, j]
@@ -137,18 +145,22 @@ def step4_semi_fully_implicit(u, w, u_1, w_1, u_2, w_2, beta, grid_param, simula
             gamma_x = tau * K_x  
             gamma_z = tau * K_z
 
-            # Градієнти та дифузійні поправки
-            beta_x = 0.5 * (beta[i + 1, j] + beta[i, j])
-            beta_z = 0.5 * (beta[i, j + 1] + beta[i, j])
+            # # Градієнти та дифузійні поправки
+            # beta_x = 0.5 * (beta[i + 1, j] + beta[i, j])
+            # beta_z = 0.5 * (beta[i, j + 1] + beta[i, j])
             
-            beta_x_safe = max(beta_x, 1E-12)
-            beta_z_safe = max(beta_z, 1E-12)
+            # beta_x_safe = max(beta_x, 1E-12)
+            # beta_z_safe = max(beta_z, 1E-12)
             
-            grad_beta_x = (beta[i + 1, j] - beta[i, j]) / dx
-            grad_beta_z = (beta[i, j + 1] - beta[i, j]) / dz
+            # grad_beta_x = (beta[i + 1, j] - beta[i, j]) / dx
+            # grad_beta_z = (beta[i, j + 1] - beta[i, j]) / dz
             
-            w_2_dx = -1.0 / beta_x_safe * D_x(u_2, D, dx, Re, i, j) * grad_beta_x
-            w_2_dz = -1.0 / beta_z_safe * D_z(w_2, D, dz, Re, i, j) * grad_beta_z
+            # w_2_dx = -1.0 / beta_x_safe * D_x(u_2, D, dx, Sh, i, j) * grad_beta_x
+            # w_2_dz = -1.0 / beta_z_safe * D_z(w_2, D, dz, Sh, i, j) * grad_beta_z
+
+            w_2_dx = 0.0
+            w_2_dz = 0.0
+
 
             # Формуємо праві частини (explicit праве крило для системи)
             # Для рідини базове значення — її поточна швидкість
@@ -187,10 +199,6 @@ def step5(u_2, w_2, beta, beta_, grid_param, simulate_param, physical_param):
             beta_[i, j] = beta[i, j] + tau * (
                         -conv_beta_tvd(u_2, w_2, beta, dx, dz, i, j) + diff_beta(u_2, w_2, beta, dx, dz, i, j, simulate_param, physical_param))
 
-    for i in prange(2, M - 2):
-        for j in range(2, N - 2):
-            beta_[i, j] = max(0.0, min(1.0, beta_[i, j]))
-
 @njit(parallel=True)
 def step_end(u, w, u_2, w_2, beta, Div, grid_param, simulate_param, physical_param):
     y = physical_param.y
@@ -203,6 +211,6 @@ def step_end(u, w, u_2, w_2, beta, Div, grid_param, simulate_param, physical_par
 
     for i in prange(2, M - 2):
         for j in range(2, N - 2):
-            div_beta_w2 = - beta[i, j] * divergence(u_2, w_2, dx, dz, i, j) + conv_beta_2_tvd(u, w, u_2, w_2, beta, dx, dz, i, j)
+            div_beta_w2 = -conv_beta_tvd(u_2, w_2, beta, dx, dz, i, j) + conv_beta_tvd(u, w, beta, dx, dz, i, j)
 
-            Div[i, j] = divergence(u, w, dx, dz, i, j) - y / (1.0 - y * beta[i, j]) * (div_beta_w2)
+            Div[i, j] = divergence(u, w, dx, dz, i, j) - y * (div_beta_w2)
