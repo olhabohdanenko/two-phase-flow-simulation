@@ -1,0 +1,24 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvConstraints;
+}
+
+constraints
+(
+    sludgeInjection
+    {
+        type            scalarFixedValueConstraint;
+        active          yes;
+
+        selectionMode   cellSet;
+        cellSet         sludgeCells;
+
+        fieldValues
+        {
+            alpha.sludge    0.001;
+        }
+    }
+);
