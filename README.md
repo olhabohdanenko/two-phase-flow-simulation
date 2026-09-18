@@ -86,6 +86,11 @@ $$
 $$
 D_{i', j}^x = D + \frac{\delta x}{Re} \left| u_{i', j} \right|, \quad D_{i', j}^z = D + \frac{\delta z}{Re} \left| w_{i', j} \right|
 $$
+
+Particle sedimentation velocity:
+
+$$V_0 = \frac{g (\rho_p - \rho_f) d^2}{18 \nu \rho_f}$$
+
 |    №  | Material   |   Density_p |   Diameter p. |   Density_f |   Kin.fluid.visc. |   Settling V |
 |-------|------------|-------------|---------------|-------------|-------------------|--------------|
 |     0 | Abrasive   |        2400 |       5e-05   |        1000 |            1e-06  |    -0.00191  |
@@ -115,3 +120,33 @@ $$
 <video src="https://github.com/user-attachments/assets/39f493d7-1773-4454-8a1c-a536851a3bea" autoplay loop muted playsinline width="100%"></video>
 
 <video src="https://github.com/user-attachments/assets/dd856e40-b103-413b-8d9b-1a727b68687f" autoplay loop muted playsinline width="100%"></video>
+
+Розрахунок 7
+
+[![Розрахунок 7 (концентрація твердої фази)](https://img.youtube.com/vi/ot0rxoV9tZM/maxresdefault.jpg)](https://youtu.be/ot0rxoV9tZM)
+
+[![Розрахунок 7 (швидкості)](https://img.youtube.com/vi/bBP0aTuADU4/maxresdefault.jpg)](https://youtu.be/bBP0aTuADU4)
+
+Розрахунок 13
+
+[![Розрахунок 13 (концентрація твердої фази)](https://img.youtube.com/vi/30mSTdmtIP4/maxresdefault.jpg)](https://youtu.be/30mSTdmtIP4)
+
+[![Розрахунок 13 (швидкості)](https://img.youtube.com/vi/NXW3bXX27i8/maxresdefault.jpg)](https://youtu.be/NXW3bXX27i8)
+
+Розрахунок 16
+
+[![Розрахунок 16 (концентрація твердої фази)](https://img.youtube.com/vi/kSMuOxZtJaA/maxresdefault.jpg)](https://youtu.be/kSMuOxZtJaA)
+
+[![Розрахунок 16 (швидкості)](https://img.youtube.com/vi/p5D3x6vhbiE/maxresdefault.jpg)](https://youtu.be/p5D3x6vhbiE)
+
+Розрахунок 17
+
+[![Розрахунок 17 (концентрація твердої фази)](https://img.youtube.com/vi/OwlW1psPOeE/maxresdefault.jpg)](https://youtu.be/OwlW1psPOeE)
+
+[![Розрахунок 17 (швидкості)](https://img.youtube.com/vi/2VbWSX5bDoU/maxresdefault.jpg)](https://youtu.be/2VbWSX5bDoU)
+
+Розрахунок 18
+
+[![Розрахунок 18 (концентрація твердої фази)](https://img.youtube.com/vi/3ML1kLi12VI/maxresdefault.jpg)](https://youtu.be/3ML1kLi12VI)
+
+[![Розрахунок 18 (швидкості)](https://img.youtube.com/vi/LPAqQJyPVhs/maxresdefault.jpg)](https://youtu.be/LPAqQJyPVhs)
