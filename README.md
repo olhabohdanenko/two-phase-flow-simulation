@@ -211,3 +211,8 @@ $$V_0 = \frac{g (\rho_p - \rho_f) d^2}{18 \nu \rho_f}$$
 [![Розрахунок 18 (концентрація твердої фази)](https://img.youtube.com/vi/3ML1kLi12VI/maxresdefault.jpg)](https://youtu.be/3ML1kLi12VI)
 
 [![Розрахунок 18 (швидкості)](https://img.youtube.com/vi/LPAqQJyPVhs/maxresdefault.jpg)](https://youtu.be/LPAqQJyPVhs)
+
+Зі змінененою швидкістю входу твердої фази
+
+[![particle](https://img.youtube.com/vi/vSyLmfuDLD4/maxresdefault.jpg)](https://youtu.be/vSyLmfuDLD4)
+
