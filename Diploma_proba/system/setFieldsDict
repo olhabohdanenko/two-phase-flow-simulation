@@ -18,7 +18,7 @@ regions
         box (0 0.075 -1) (0.02 0.085 1);
         fieldValues
         (
-            volScalarFieldValue alpha.sludge 0.001
+            volScalarFieldValue alpha.sludge 0.08257
         );
     }
 );

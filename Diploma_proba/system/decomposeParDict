@@ -10,25 +10,12 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      turbulenceProperties;
+    object      decomposeParDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-simulationType      laminar;
+numberOfSubdomains 4;
 
-RAS
-{
-    RASModel        kEpsilon;
-
-    turbulence      on;
-
-    printCoeffs     on;
-
-    buoyantKEpsilonCoeffs
-    {
-        Cg      0.85;
-    }
-}
-
+method          scotch;
 
 // ************************************************************************* //

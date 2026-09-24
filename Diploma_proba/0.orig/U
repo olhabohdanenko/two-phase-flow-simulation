@@ -9,24 +9,54 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    object      turbulenceProperties;
+    class       volVectorField;
+    object      U;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-simulationType      laminar;
+dimensions      [0 1 -1 0 0 0 0];
 
-RAS
+internalField   uniform (0.0 0 0);
+
+boundaryField
 {
-    RASModel        kEpsilon;
-
-    turbulence      on;
-
-    printCoeffs     on;
-
-    buoyantKEpsilonCoeffs
+    inlet
     {
-        Cg      0.85;
+        type            fixedValue;
+        value           uniform (0.422794 0 0);
+    }
+
+    outlet
+    {
+        type            pressureInletOutletVelocity;
+        value           $internalField;
+    }
+
+    bottomWall
+    {
+        type            slip;
+    }
+
+    nozzles
+    {
+        type            fixedValue;
+        value           uniform (0 0.399305 0);
+    }
+    
+    sludgeInlet
+    {
+        type            fixedValue;
+        value           uniform (0 -2.2147 0);
+    }
+
+    top
+    {
+        type            slip;
+    }
+
+    frontAndBack
+    {
+        type            empty;
     }
 }
 

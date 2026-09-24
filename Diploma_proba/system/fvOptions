@@ -17,7 +17,7 @@ FoamFile
 sludgeInjection
 {
     type            scalarSemiImplicitSource;
-    active          yes;
+    active          no;
 
     selectionMode   cellSet;
     cellSet         sludgeCells;
@@ -26,7 +26,7 @@ sludgeInjection
 
     injectionRateSuSp
     {
-        alpha.sludge    (0.001 0);
+        alpha.sludge    (0.08257 0);
     }
 }
 

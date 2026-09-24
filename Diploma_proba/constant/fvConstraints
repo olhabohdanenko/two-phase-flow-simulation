@@ -18,7 +18,7 @@ constraints
 
         fieldValues
         {
-            alpha.sludge    0.001;
+            alpha.sludge    0.08257;
         }
     }
 );
