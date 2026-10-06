@@ -38,7 +38,7 @@ $$
 \vec{v}_{21} = \vec{v}_{2} - \vec{v}_{1}, \qquad \vec{v}_{21} = \frac{\vec{v}_{2} - \vec{v}}{1 - \beta x}, \qquad \vec{v}_{21} = \frac{\vec{v} - \vec{v}_{1}}{\beta x}
 $$
 
-Taking into account assumption 3, the component $\phi = 0$. And considering assumption 2, the component $- x \nabla^{k} \left( \beta \vec{w_{2}} w_{2}^{k} \right)$ is neglected.
+Taking into account assumption 3, the component $\phi = 0$. And considering assumption 2, the component $`- x \nabla^{k} \left( \beta \vec{w}_{2} w_{2}^{k} \right)`$ is neglected.
 
 Then, we can write the velocity equation of the solid phase:
 
@@ -50,7 +50,7 @@ $$
 \vec{f}_{D} = - \left( C_{1D} \nu_{1} \frac{\vec{v}_{21}}{d^{2}} + C_{2D} \frac{\vec{v}_{21}^{2}}{d} \right) \vec{n}_{21}
 $$
 
-where $\vec{f_{D}}$ is the specific drag force, $\vec{v_{2}}$ is the velocity of the solid phase, $\vec{v_{21}} = \vec{v_{2}} - \vec{v_{1}}$ is the relative velocity of the phases, $C_{A}$ is the added mass coefficient, $C_{1D}$ is the linear (viscous) drag coefficient (corresponding to Stokes' law), $C_{2D}$ is the quadratic (inertial) drag coefficient (corresponding to Newton's law at high Reynolds numbers). For our assumptions, we have: $C_{1D} = 18$, $C_{2D} = 0$.
+where $`\vec{f}_{D}`$ is the specific drag force, $`\vec{v}_{2}`$ is the velocity of the solid phase, $`\vec{v}_{21}`$ is the relative velocity of the phases, $C_{A}$ is the added mass coefficient, $C_{1D}$ is the linear (viscous) drag coefficient (corresponding to Stokes' law), $C_{2D}$ is the quadratic (inertial) drag coefficient (corresponding to Newton's law at high Reynolds numbers). For our assumptions, we have: $C_{1D} = 18$, $C_{2D} = 0$.
 
 The assumption for the mixture momentum equation includes the constancy of the number of particles in the selected unit volume, which is fulfilled during their coordinated collective motion; if this is not the case, an effective diffusion component is added to the equation:
 
@@ -62,7 +62,7 @@ Then:
 
 $$
 \vec{v}_{2} = \vec{v}_{2}^{c} + \vec{w}_{2}^{d}
-$$
+`$$
 
 where $\vec{v}_{2}^{c}$ is the collective component of the solid phase velocity, which satisfies the solid phase velocity equation.
 With this in mind, the mass transport equation for the solid phase will take the form:
