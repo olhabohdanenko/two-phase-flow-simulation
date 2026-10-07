@@ -1,5 +1,13 @@
 # Mathematical Model of Solid-Liquid Medium Flow
 
+[![Розрахунок 5(OpenFOAM)](https://img.youtube.com/vi/QnD3YQ-3VIQ/maxresdefault.jpg)](https://youtu.be/QnD3YQ-3VIQ)
+
+[![Розрахунок 6(OpenFOAM)](https://img.youtube.com/vi/mYL8onwFaHY/maxresdefault.jpg)](https://youtu.be/mYL8onwFaHY)
+
+[![Розрахунок 6(Python)](https://img.youtube.com/vi/0_Iabrxc_JA/maxresdefault.jpg)](https://youtu.be/0_Iabrxc_JA)
+
+[![Розрахунок 7(OpenFOAM)](https://img.youtube.com/vi/JZ5t9hGOTT4/maxresdefault.jpg)](https://youtu.be/JZ5t9hGOTT4)
+
 This paper presents a mathematical model of the solid-liquid medium (suspension) flow. To model the movement of solid particles in a fluid stream, we state the following assumptions:
 
 1. Interaction between particles is neglected, as their sizes and masses are insignificant compared to the fluid flow;
