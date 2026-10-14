@@ -1,0 +1,21 @@
+#!/bin/sh
+cd "${0%/*}" || exit
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
+
+#------------------------------------------------------------------------------
+
+restore0Dir
+
+# Побудова сітки
+runApplication blockMesh
+runApplication topoSet
+runApplication createPatch -overwrite
+
+# Декомпозиція та паралельний запуск
+runApplication decomposePar
+runParallel $(getApplication)
+
+# Реконструкція результатів (включаючи Лагранжеві хмари частинок)
+runApplication reconstructPar
+
+#------------------------------------------------------------------------------

@@ -1,0 +1,150 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2606                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      kinematicCloudProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solution
+{
+    active          true;
+    coupled         false;        // 1-way coupling (якщо треба 2-way, постав true)
+    transient       yes;
+    cellValueSourceCorrection off;
+    maxCo           0.3;
+
+    sourceTerms
+    {
+        schemes
+        {
+        }
+    }
+
+    interpolationSchemes
+    {
+        rho             cell;
+        U               cellPoint;
+        mu              cell;
+        muc             cellPoint;
+    }
+
+    integrationSchemes
+    {
+        U               Euler;
+    }
+}
+
+constantProperties
+{
+    rho0            7800;         // Взято з rho_2 = 7800.0 у Python
+    youngsModulus   1e8;          // Модуль Юнга для металевих частинок
+    poissonsRatio   0.30;
+}
+
+subModels
+{
+    particleForces
+    {
+        sphereDrag;              // Опір середовища
+        gravity;                 // Сила тяжіння
+    }
+
+    injectionModels
+    {
+        model1
+        {
+            type            patchInjection;
+            patch       sludgeInlet;       // Назва вашого патча з createPatchDict
+            parcelBasisType fixed;
+            nParticle       1;
+            SOI             0;
+            duration        10;                // Тривалість впорскування (сек)
+            parcelsPerSecond 20000;            // Кількість частинок/пакунків за секунду
+            flowRateProfile constant 1;
+            
+            // Загальна масова витрата частинок (кг/с):
+            // m_dot = rho_2 * V_imp * Area * conc = 7800 * 2.426 * (0.02 * 0.16) * 0.00826 ≈ 0.5 \kg/s
+            massTotal       2.5;               // Загальна маса за 10 сек (0.250 кг/с * 10 с)
+
+            // Початкова швидкість при вході з Python 
+            U0              (0.01 -0.1 0);      // Якщо під кутом:
+
+            sizeDistribution
+            {
+                type        fixedValue;
+                fixedValueDistribution
+                {
+                    value   2.5e-4;             // d = 2.5e-4 (250 мкм) з Python
+                }
+            }
+        }
+    }
+
+    dispersionModel none;                      // За бажанням можна увімкнути stochasticDispersionRAS
+
+    patchInteractionModel standardWallInteraction;
+    standardWallInteractionCoeffs
+    {
+        type        rebound;
+        e           0.9;                       // Коефіцієнт відновлення при ударі об стінку
+        mu          0.1;
+    }
+
+    surfaceFilmModel none;
+
+    stochasticCollisionModel none;
+
+    collisionModel pairCollision;
+
+    pairCollisionCoeffs
+    {
+        maxInteractionDistance 0.002;
+
+        writeReferredParticleCloud no;
+
+        pairModel pairSpringSliderDashpot;
+
+        pairSpringSliderDashpotCoeffs
+        {
+            useEquivalentSize   no;
+            alpha               0.12;
+            b                   1.5;
+            mu                  0.52;
+            cohesionEnergyDensity 0;
+            collisionResolutionSteps 12;
+        };
+
+        wallModel   wallSpringSliderDashpot;    // <--- ЗМІНИЛИ З wallLocalSpringSliderDashpot
+
+        wallSpringSliderDashpotCoeffs
+        {
+            useEquivalentSize   no;
+            collisionResolutionSteps 12;
+            youngsModulus       1e10;
+            poissonsRatio       0.23;
+            alpha               0.12;
+            b                   1.5;
+            mu                  0.43;
+            cohesionEnergyDensity 0;
+        };
+    }
+}
+
+cloudFunctions
+{
+    ReynoldsNumber1
+    {
+        type            ReynoldsNumber;
+    }
+}
+
+// ************************************************************************* //

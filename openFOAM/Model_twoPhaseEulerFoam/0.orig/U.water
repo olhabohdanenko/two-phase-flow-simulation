@@ -1,0 +1,69 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2606                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    object      U.water;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+    inlet
+    {
+        type               interstitialInletVelocity;
+        inletVelocity      uniform (0.422794 0 0);
+        alpha              alpha.water;
+        value              $internalField;
+    }
+
+    outlet
+    {
+        type               pressureInletOutletVelocity;
+        phi                phi.water;
+        value              $internalField;
+    }
+
+    bottomWall
+    {
+        type               slip;
+    }
+
+    nozzles
+    {
+        type               interstitialInletVelocity;
+        inletVelocity      uniform (0 0.399305 0);
+        alpha              alpha.water;
+        value              $internalField;
+    }
+    
+    sludgeInlet
+    {
+        type               fixedValue;
+        value              uniform (0 0 0);
+    }
+
+    top
+    {
+        type               slip;
+    }
+
+    frontAndBack
+    {
+        type               empty;
+    }
+}
+
+
+// ************************************************************************* //

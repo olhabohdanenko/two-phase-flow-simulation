@@ -1,0 +1,45 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      topoSetDict;
+}
+
+actions
+(
+    {
+        name    nozzleFaces;
+        type    faceSet;
+        action  new;
+        source  boxToFace;
+        box     (0.045 -0.001 -0.01) (0.055 0.001 0.2);
+    }
+
+    { name nozzleFaces; type faceSet; action add; source boxToFace; box (0.095 -0.001 -0.01) (0.105 0.001 0.2); }
+    { name nozzleFaces; type faceSet; action add; source boxToFace; box (0.145 -0.001 -0.01) (0.155 0.001 0.2); }
+    { name nozzleFaces; type faceSet; action add; source boxToFace; box (0.195 -0.001 -0.01) (0.205 0.001 0.2); }
+    { name nozzleFaces; type faceSet; action add; source boxToFace; box (0.245 -0.001 -0.01) (0.255 0.001 0.2); }
+    { name nozzleFaces; type faceSet; action add; source boxToFace; box (0.295 -0.001 -0.01) (0.305 0.001 0.2); }
+    { name nozzleFaces; type faceSet; action add; source boxToFace; box (0.345 -0.001 -0.01) (0.355 0.001 0.2); }
+    { name nozzleFaces; type faceSet; action add; source boxToFace; box (0.395 -0.001 -0.01) (0.405 0.001 0.2); }
+    { name nozzleFaces; type faceSet; action add; source boxToFace; box (0.445 -0.001 -0.01) (0.455 0.001 0.2); }
+
+    // НОВЕ: грані верхньої лівої межі для вприску частинок
+    {
+        name    sludgeInletFaces;
+        type    faceSet;
+        action  new;
+        source  boxToFace;
+        box     (0 0.084 -0.01) (0.02 0.086 0.17);
+    }
+
+    // залишаємо для початкової плями (опційно)
+    {
+        name    sludgeCells;
+        type    cellSet;
+        action  new;
+        source  boxToCell;
+        box     (0 0.075 -1) (0.02 0.085 1);
+    }
+);

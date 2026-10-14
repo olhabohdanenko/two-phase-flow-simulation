@@ -1,0 +1,71 @@
+# VS Code
+.vscode/
+*.code-workspace
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.pytest_cache/
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# C++ / C#
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+*.lib
+*.a
+*.pdb
+*.idb
+*.ipch
+.vs/
+bin/
+obj/
+
+# OpenFOAM
+/[0-9]*
+!/0
+*.foam
+log.*
+probes/
+postProcessing/^
+processor*/
+
+# Результати симуляцій
+
+run_*/
+
+*.h5
+simulation_log.json
+metadata.json
+
+# Операційна система
+.DS_Store
+Thumbs.db
