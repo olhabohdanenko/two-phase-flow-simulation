@@ -8,6 +8,12 @@
 
 [![Розрахунок 7(OpenFOAM)](https://img.youtube.com/vi/JZ5t9hGOTT4/maxresdefault.jpg)](https://youtu.be/JZ5t9hGOTT4)
 
+[![Розрахунок 6 (Швидкості і Лагранжеві частинки)](https://img.youtube.com/vi/pu_ioRcRacc/maxresdefault.jpg)](https://youtu.be/pu_ioRcRacc)
+
+[![Розрахунок 6 (Число Рейнольдса Лагранжевих частинок)](https://img.youtube.com/vi/GiB0CdFJQlE/maxresdefault.jpg)](https://youtu.be/GiB0CdFJQlE)
+
+[![Розрахунок 6 (Об'ємна концентрація частинок, двофазна модель)](https://img.youtube.com/vi/CHosrqrRle8/maxresdefault.jpg)](https://youtu.be/CHosrqrRle8)
+
 This paper presents a mathematical model of the solid-liquid medium (suspension) flow. To model the movement of solid particles in a fluid stream, we state the following assumptions:
 
 1. Interaction between particles is neglected, as their sizes and masses are insignificant compared to the fluid flow;
