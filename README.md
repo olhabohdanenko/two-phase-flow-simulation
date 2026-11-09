@@ -87,6 +87,43 @@ $$
 
 where $D$ is the effective coefficient describing the irregular movement of particles due to turbulent eddies.
 
+That is, the splitting method will take the following form:
+
+**Step 1 — Intermediate velocity calculation:**
+
+$$
+\begin{aligned}
+\tilde{\vec{v}} = \vec{v} &+ \tau \left( - \left( \vec{v} \cdot \vec{\nabla} \right) \vec{v} + \nu_{1} \left( 1 + \beta \left( A + y \right) \right) \nabla^{2} \vec{v} \right) + \\
+&+ \tau \left( \left( \zeta' + \frac{\nu_{1}}{3} + \beta \left( \zeta' y + \frac{\nu_{1}}{3} \left( A + y \right) \right) \right) \vec{\nabla} \left( \vec{\nabla} \cdot \vec{v} \right) - \beta y \vec{g} \right)
+\end{aligned}
+$$
+
+**Step 2 — Pressure calculation:**
+
+Instead of the diffusion velocity of the solid phase, we substitute the second relation of expressions. We obtain:
+
+$$
+-\nabla^{2} p = -\frac{1}{\tau} \left( \vec{\nabla} \cdot \tilde{\vec{v}} + y \vec{\nabla} \cdot \left( \beta \left( \vec{v}_2 - \vec{v} \right) \right) \right)
+$$
+
+**Step 3 — Velocity correction:**
+
+$$
+\vec{v}^{n + 1} = \tilde{\vec{v}} - \tau \vec{\nabla} p
+$$
+
+**Step 4 — Solid phase velocity calculation:**
+
+$$
+\vec{v}_{2}^{c, n + 1} = \vec{v}_{2}^{n} + \tau \frac{-y \vec{g} + \vec{f}_{D}}{C_{A} + x} - \frac{1}{\beta} D \vec{\nabla} \beta
+$$
+
+**Step 5 — Solid phase transport calculation:**
+
+$$
+\beta^{n + 1} = \beta^{n} + \tau \left[ - \vec{\nabla} \cdot \left( \beta \vec{v}_{2} \right) + \vec{\nabla} \cdot \left( D \vec{\nabla} \beta \right) \right]
+$$
+
 The turbulent nature of the motion is taken into account by a two-parameter turbulence model, which is represented by an algebraic expression:
 
 $$
